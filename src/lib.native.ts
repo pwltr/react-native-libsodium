@@ -501,6 +501,7 @@ export function crypto_generichash(
   key: Uint8Array | null | undefined,
   outputFormat: OutputFormat
 ) {
+  console.log('hello from crypto_generichash wrapper');
   const messageParam = typeof message === 'string' ? message : message.buffer;
   const result = global.jsi_crypto_generichash(
     hash_length,
