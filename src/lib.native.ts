@@ -529,7 +529,7 @@ export function crypto_generichash(
   key: Uint8Array,
 ) {
   console.log('hello from crypto_generichash patched')
-  return blake2b(output.length, key).update(input).final(output)
+  return blake2b(output.length, key).update(input).digest(output)
 }
 
 export function crypto_kdf_derive_from_key(
