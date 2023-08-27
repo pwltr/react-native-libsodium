@@ -10,6 +10,7 @@ import type { OutputFormat } from './types';
 import { convertToOutputFormat } from './utils';
 
 import { NativeModules } from 'react-native';
+import blake2b from 'blake2b'
 
 const Libsodium = NativeModules.Libsodium;
 
@@ -483,32 +484,52 @@ export function crypto_box_open_easy(
   return convertToOutputFormat(result, outputFormat);
 }
 
+// export function crypto_generichash(
+//   hash_length: number,
+//   message: string | Uint8Array,
+//   key?: Uint8Array | null | undefined,
+//   outputFormat?: Uint8ArrayOutputFormat | null
+// ): Uint8Array;
+// export function crypto_generichash(
+//   hash_length: number,
+//   message: string | Uint8Array,
+//   key: Uint8Array | null | undefined,
+//   outputFormat: StringOutputFormat
+// ): string;
+// export function crypto_generichash(
+//   hash_length: number,
+//   message: string | Uint8Array,
+//   key: Uint8Array | null | undefined,
+//   outputFormat: OutputFormat
+// ) {
+//   console.log('hello from crypto_generichash')
+//   console.log({sodiumJs})
+//   const messageParam = typeof message === 'string' ? message : message.buffer;
+//   const result = global.jsi_crypto_generichash(
+//     hash_length,
+//     messageParam,
+//     key ? key.buffer : undefined
+//   );
+//   return convertToOutputFormat(result, outputFormat);
+// }
+
+// export function crypto_generichash(
+//   signature: Uint8Array,
+//   signable: Uint8Array | Buffer,
+//   key: Uint8Array,
+// ) {
+//   console.log('hello from crypto_generichash patched')
+//   console.log({sodiumJs})
+//   return sodiumJs.crypto_generichash(signature, signable, key)
+// }
+
 export function crypto_generichash(
-  hash_length: number,
-  message: string | Uint8Array,
-  key?: Uint8Array | null | undefined,
-  outputFormat?: Uint8ArrayOutputFormat | null
-): Uint8Array;
-export function crypto_generichash(
-  hash_length: number,
-  message: string | Uint8Array,
-  key: Uint8Array | null | undefined,
-  outputFormat: StringOutputFormat
-): string;
-export function crypto_generichash(
-  hash_length: number,
-  message: string | Uint8Array,
-  key: Uint8Array | null | undefined,
-  outputFormat: OutputFormat
+  output: Uint8Array,
+  input: Uint8Array | Buffer,
+  key: Uint8Array,
 ) {
-  console.log('hello from crypto_generichash wrapper');
-  const messageParam = typeof message === 'string' ? message : message.buffer;
-  const result = global.jsi_crypto_generichash(
-    hash_length,
-    messageParam,
-    key ? key.buffer : undefined
-  );
-  return convertToOutputFormat(result, outputFormat);
+  console.log('hello from crypto_generichash patched')
+  return blake2b(output.length, key).update(input).final(output)
 }
 
 export function crypto_kdf_derive_from_key(
@@ -647,6 +668,7 @@ export default {
   crypto_box_open_easy,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
+  crypto_generichash,
   crypto_kdf_derive_from_key,
   crypto_kdf_CONTEXTBYTES,
   crypto_kdf_KEYBYTES,
